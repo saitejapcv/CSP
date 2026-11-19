@@ -6,35 +6,54 @@ from cluster_scheduler.constraints import (
     ZoneAffinityConstraint,
     ZoneSpreadConstraint,
     PairCapacityConstraint,
+    NodeFitConstraint,
+    CapacityConstraint,
 )
 
+
 class CSP:
-    def __init__(self, variables, domains, constraints):
+    def __init__(self, variables, domains, constraints, jobs=None, nodes=None):
         self.variables = variables
         self.domains = domains
         self.constraints = constraints
+        # Raw data, needed by the solver for the exact capacity check.
+        self.jobs = jobs if jobs is not None else {}
+        self.nodes = nodes if nodes is not None else {}
+        self._index_size = -1
+        self._neighbours = {}
+        self._between = {}
 
-    def neighbours(self, var):
-        result = set()
+    # AC-3 calls neighbours() and constraints_between() very often, so the
+    # binary-constraint index is built once (and rebuilt if constraints change).
+    def _build_index(self):
+        if self._index_size == len(self.constraints):
+            return
+
+        neighbours = {}
+        between = {}
 
         for constraint in self.constraints:
             if len(constraint.scope) == 2:
                 x, y = constraint.scope
+                neighbours.setdefault(x, set()).add(y)
+                neighbours.setdefault(y, set()).add(x)
+                between.setdefault(frozenset((x, y)), []).append(constraint)
 
-                if x == var:
-                    result.add(y)
-                elif y == var:
-                    result.add(x)
+        self._neighbours = neighbours
+        self._between = between
+        self._index_size = len(self.constraints)
 
-        return result
+    def neighbours(self, var):
+        self._build_index()
+        return set(self._neighbours.get(var, ()))
+
+    # The interface contract (project plan, section 9) spells it "neighbors".
+    def neighbors(self, var):
+        return self.neighbours(var)
 
     def constraints_between(self, x, y):
-        return [
-            constraint
-            for constraint in self.constraints
-            if len(constraint.scope) == 2
-               and set(constraint.scope) == {x, y}
-        ]
+        self._build_index()
+        return list(self._between.get(frozenset((x, y)), ()))
 
     def is_consistent(self, var, node, assignment):
         # Create a temporary assignment.
@@ -54,6 +73,7 @@ class CSP:
             var: set(domain)
             for var, domain in self.domains.items()
         }
+
 
 def build_csp(cluster: Cluster, jobs: list[Job], constraint_specs: list[dict]) -> CSP:
     jobs_by_id = {job.id: job for job in jobs}
@@ -81,6 +101,12 @@ def build_csp(cluster: Cluster, jobs: list[Job], constraint_specs: list[dict]) -
             constraint = AllowedZonesConstraint(
                 job_ids[0], jobs_by_id, nodes_by_id,
             )
+        elif constraint_type == "fits_node":
+            constraint = NodeFitConstraint(
+                job_ids[0], jobs_by_id, nodes_by_id,
+            )
+        elif constraint_type == "capacity":
+            constraint = CapacityConstraint(jobs_by_id, nodes_by_id)
         elif constraint_type == "anti_affinity":
             constraint = AntiAffinityConstraint(
                 job_ids[0], job_ids[1]
@@ -103,4 +129,4 @@ def build_csp(cluster: Cluster, jobs: list[Job], constraint_specs: list[dict]) -
         constraints.append(constraint)
 
 
-    return CSP(variables, domains, constraints)
+    return CSP(variables, domains, constraints, jobs_by_id, nodes_by_id)

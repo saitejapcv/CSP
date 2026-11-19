@@ -1,0 +1,77 @@
+{
+  "cluster": {
+    "zones": [
+      "ZA",
+      "ZB"
+    ],
+    "nodes": [
+      {
+        "id": "N1",
+        "zone": "ZA",
+        "cpu": 16,
+        "ram": 64,
+        "gpu": false
+      },
+      {
+        "id": "N2",
+        "zone": "ZA",
+        "cpu": 16,
+        "ram": 64,
+        "gpu": false
+      },
+      {
+        "id": "N3",
+        "zone": "ZB",
+        "cpu": 16,
+        "ram": 64,
+        "gpu": false
+      },
+      {
+        "id": "N4",
+        "zone": "ZB",
+        "cpu": 16,
+        "ram": 64,
+        "gpu": false
+      }
+    ]
+  },
+  "jobs": [
+    {
+      "id": "a",
+      "service": "svc",
+      "cpu": 4,
+      "ram": 16,
+      "needs_gpu": false,
+      "allowed_zones": [
+        "ZA"
+      ]
+    },
+    {
+      "id": "b",
+      "service": "svc",
+      "cpu": 4,
+      "ram": 16,
+      "needs_gpu": false,
+      "allowed_zones": [
+        "ZB"
+      ]
+    },
+    {
+      "id": "c",
+      "service": "svc",
+      "cpu": 2,
+      "ram": 8,
+      "needs_gpu": false,
+      "allowed_zones": null
+    }
+  ],
+  "constraints": [
+    {
+      "type": "zone_affinity",
+      "jobs": [
+        "a",
+        "b"
+      ]
+    }
+  ]
+}

@@ -186,3 +186,68 @@ class PairCapacityConstraint(Constraint):
             return True
 
         return self.allows(job1_id, node1_id, job2_id, node2_id)
+
+
+# --------------------------------------------------
+# 7. Node Fit Constraint (Unary)          [added during integration]
+# --------------------------------------------------
+
+class NodeFitConstraint(Constraint):
+    """A job must fit on an EMPTY node (its CPU and RAM must not exceed the node's).
+
+    Without this rule node consistency cannot see that a huge job fits nowhere.
+    """
+
+    def __init__(self, job_id, jobs, nodes):
+        super().__init__((job_id,))
+        self.jobs = jobs
+        self.nodes = nodes
+
+    def is_satisfied(self, assignment: dict[str, str]) -> bool:
+        job_id = self.scope[0]
+        node_id = assignment.get(job_id)
+
+        if node_id is None:
+            return True
+
+        job = self.jobs[job_id]
+        node = self.nodes[node_id]
+
+        return job.cpu <= node.cpu and job.ram <= node.ram
+
+
+# --------------------------------------------------
+# 8. Capacity Constraint (exact, n-ary)   [added during integration]
+# --------------------------------------------------
+
+class CapacityConstraint(Constraint):
+    """Total CPU and RAM of all jobs placed on one node must fit the node.
+
+    This is the exact n-ary rule. AC-3 cannot use it (it only works on pairs),
+    so it deliberately has no `allows`; PairCapacityConstraint is its pairwise
+    shadow for pruning, and Backtracking enforces this one with running totals.
+    """
+
+    def __init__(self, jobs, nodes):
+        super().__init__(tuple(jobs))
+        self.jobs = jobs
+        self.nodes = nodes
+
+    def is_satisfied(self, assignment: dict[str, str]) -> bool:
+        cpu: dict[str, int] = {}
+        ram: dict[str, int] = {}
+
+        for job_id in self.scope:
+            node_id = assignment.get(job_id)
+            if node_id is None:
+                continue
+            job = self.jobs[job_id]
+            cpu[node_id] = cpu.get(node_id, 0) + job.cpu
+            ram[node_id] = ram.get(node_id, 0) + job.ram
+
+        for node_id, used_cpu in cpu.items():
+            node = self.nodes[node_id]
+            if used_cpu > node.cpu or ram[node_id] > node.ram:
+                return False
+
+        return True
