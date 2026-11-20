@@ -1,0 +1,128 @@
+{
+  "cluster": {
+    "zones": [
+      "ZA",
+      "ZB"
+    ],
+    "nodes": [
+      {
+        "id": "N1",
+        "zone": "ZA",
+        "cpu": 16,
+        "ram": 64,
+        "gpu": true
+      },
+      {
+        "id": "N2",
+        "zone": "ZA",
+        "cpu": 16,
+        "ram": 64,
+        "gpu": false
+      },
+      {
+        "id": "N3",
+        "zone": "ZB",
+        "cpu": 16,
+        "ram": 64,
+        "gpu": false
+      },
+      {
+        "id": "N4",
+        "zone": "ZB",
+        "cpu": 8,
+        "ram": 32,
+        "gpu": false
+      }
+    ]
+  },
+  "jobs": [
+    {
+      "id": "ml-train",
+      "service": "ml",
+      "cpu": 8,
+      "ram": 32,
+      "needs_gpu": true,
+      "allowed_zones": null
+    },
+    {
+      "id": "cache",
+      "service": "cache",
+      "cpu": 2,
+      "ram": 8,
+      "needs_gpu": false,
+      "allowed_zones": null
+    },
+    {
+      "id": "api-1",
+      "service": "api",
+      "cpu": 4,
+      "ram": 16,
+      "needs_gpu": false,
+      "allowed_zones": null
+    },
+    {
+      "id": "api-2",
+      "service": "api",
+      "cpu": 4,
+      "ram": 16,
+      "needs_gpu": false,
+      "allowed_zones": [
+        "ZB"
+      ]
+    },
+    {
+      "id": "db",
+      "service": "db",
+      "cpu": 8,
+      "ram": 32,
+      "needs_gpu": false,
+      "allowed_zones": null
+    },
+    {
+      "id": "worker",
+      "service": "worker",
+      "cpu": 6,
+      "ram": 24,
+      "needs_gpu": false,
+      "allowed_zones": null
+    },
+    {
+      "id": "batch",
+      "service": "batch",
+      "cpu": 6,
+      "ram": 24,
+      "needs_gpu": false,
+      "allowed_zones": null
+    }
+  ],
+  "constraints": [
+    {
+      "type": "anti_affinity",
+      "jobs": [
+        "api-1",
+        "api-2"
+      ]
+    },
+    {
+      "type": "zone_spread",
+      "jobs": [
+        "api-1",
+        "api-2"
+      ]
+    },
+    {
+      "type": "zone_affinity",
+      "jobs": [
+        "cache",
+        "ml-train"
+      ]
+    },
+    {
+      "type": "zone_affinity",
+      "jobs": [
+        "db",
+        "api-1"
+      ]
+    }
+  ]
+}

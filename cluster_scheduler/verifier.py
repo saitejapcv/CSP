@@ -74,6 +74,11 @@ def verify(cluster, jobs, assignment, constraint_specs=()):
         constraint_type = spec["type"]
         job_ids = spec["jobs"]
 
+        # Unary and aggregate rules are re-derived from the raw job and node
+        # data in sections 2 and 4, so their specs need no pairwise check.
+        if constraint_type in ("gpu", "allowed_zones", "fits_node", "capacity"):
+            continue
+
         if len(job_ids) != 2:
             errors.append(
                 f"{constraint_type} requires exactly two job IDs."
