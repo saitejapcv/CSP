@@ -4,11 +4,19 @@
 
 | config | instances | solved | timeout | mean nodes | mean backtracks | mean checks | mean ms | failed verifier |
 |---|---|---|---|---|---|---|---|---|
+<<<<<<< Updated upstream
 | bt | 50 | 50 | 0 | 247.9 | 233.9 | 2419 | 0.85 | 0 |
 | bt_mrv | 50 | 50 | 0 | 18.2 | 4.2 | 1440 | 0.52 | 0 |
 | ac3_bt | 50 | 50 | 0 | 49.2 | 35.2 | 416 | 0.70 | 0 |
 | ac3_bt_mrv | 50 | 50 | 0 | 17.5 | 3.5 | 1035 | 0.86 | 0 |
 | firstfit | 50 | 2 | 0 | 6.6 | 0.0 | 45 | 0.11 | 0 |
+=======
+| bt | 50 | 50 | 0 | 247.9 | 233.9 | 2419 | 3.26 | 0 |
+| bt_mrv | 50 | 50 | 0 | 18.2 | 4.2 | 1440 | 2.05 | 0 |
+| ac3_bt | 50 | 50 | 0 | 49.2 | 35.2 | 416 | 2.70 | 0 |
+| ac3_bt_mrv | 50 | 50 | 0 | 17.5 | 3.5 | 1035 | 3.31 | 0 |
+| firstfit | 50 | 2 | 0 | 6.6 | 0.0 | 45 | 0.42 | 0 |
+>>>>>>> Stashed changes
 
 ### First-fit vs the CSP solver (every instance is satisfiable by construction)
 
