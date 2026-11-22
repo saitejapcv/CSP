@@ -72,11 +72,18 @@ def ac3(csp,domains,queue = None):
         return False,doms,stats
 
 
+    # Neighbours come back as a set, whose order changes from run to run (string
+    # hashing is randomised). Visiting them in variable order keeps every statistic
+    # (arcs processed, constraint checks, partial pruning counts) reproducible.
+    order = {v: i for i, v in enumerate(csp.variables)}
+    def ordered(xs):
+        return sorted(xs, key = lambda x: (order.get(x, len(order)), str(x)))
+
     if queue is None:
         arcs = deque(
             (xi,xj)
             for xi in csp.variables
-            for xj in csp.neighbors(xi)
+            for xj in ordered(csp.neighbors(xi))
         )
     else:
         arcs = deque(queue)
@@ -95,7 +102,7 @@ def ac3(csp,domains,queue = None):
                 stats["time"] = perf_counter() - t0
                 return False,doms,stats
 
-            for xk in csp.neighbors(xi):
+            for xk in ordered(csp.neighbors(xi)):
                 if xk != xj:
                     arcs.append((xk,xi))
 

@@ -1,0 +1,29 @@
+{
+  "method": "ac3+bt+mrv",
+  "status": "solved",
+  "assignment": {
+    "ml-train": "N1",
+    "db": "N1",
+    "api-1": "N2",
+    "cache": "N2",
+    "api-2": "N3",
+    "worker": "N2",
+    "batch": "N3"
+  },
+  "stats": {
+    "nodes_expanded": 7,
+    "backtracks": 0,
+    "constraint_checks": 264,
+    "time": 0.00047039997298270464,
+    "status": "solved"
+  },
+  "pruning": {
+    "arcs_processed": 44,
+    "revisions": 3,
+    "values_pruned": 11,
+    "time": 0.0006498000002466142,
+    "failed_at": null
+  },
+  "verified": true,
+  "violations": []
+}

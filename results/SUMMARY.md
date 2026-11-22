@@ -4,11 +4,11 @@
 
 | config | instances | solved | timeout | mean nodes | mean backtracks | mean checks | mean ms | failed verifier |
 |---|---|---|---|---|---|---|---|---|
-| bt | 50 | 50 | 0 | 247.9 | 233.9 | 2356 | 1.19 | 0 |
-| bt_mrv | 50 | 50 | 0 | 18.2 | 4.2 | 1442 | 0.73 | 0 |
-| ac3_bt | 50 | 50 | 0 | 49.2 | 35.2 | 414 | 0.99 | 0 |
-| ac3_bt_mrv | 50 | 50 | 0 | 17.5 | 3.5 | 1032 | 1.22 | 0 |
-| firstfit | 50 | 2 | 0 | 6.6 | 0.0 | 47 | 0.14 | 0 |
+| bt | 50 | 50 | 0 | 247.9 | 233.9 | 2419 | 0.85 | 0 |
+| bt_mrv | 50 | 50 | 0 | 18.2 | 4.2 | 1440 | 0.52 | 0 |
+| ac3_bt | 50 | 50 | 0 | 49.2 | 35.2 | 416 | 0.70 | 0 |
+| ac3_bt_mrv | 50 | 50 | 0 | 17.5 | 3.5 | 1035 | 0.86 | 0 |
+| firstfit | 50 | 2 | 0 | 6.6 | 0.0 | 45 | 0.11 | 0 |
 
 ### First-fit vs the CSP solver (every instance is satisfiable by construction)
 
@@ -24,7 +24,7 @@
 | instance kind | instances | % removed by node consistency | % removed in total | infeasible found by node consistency | infeasible found by AC-3 | not detected |
 |---|---|---|---|---|---|---|
 | sat | 20 | 17.0 | 46.9 | 0 | 0 | 20 |
-| unsat_pigeonhole | 20 | 14.0 | 42.0 | 0 | 7 | 13 |
+| unsat_pigeonhole | 20 | 14.0 | 41.9 | 0 | 7 | 13 |
 | unsat_gpu | 20 | 21.5 | 21.5 | 20 | 0 | 0 |
 | unsat_zone_conflict | 20 | 19.9 | 23.8 | 4 | 16 | 0 |
 AC-3 / node consistency reported infeasible on 0 satisfiable instances (must be 0). 'not detected' on an unsat kind means only search can prove it.
