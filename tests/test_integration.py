@@ -217,3 +217,24 @@ def test_benchmark_verifies_every_solution_honestly(monkeypatch):
     monkeypatch.setattr(backtracking, "backtrack", bad_solver)
     row = run_one("bt", 8, 3, 0.8, 0.5, 2)
     assert row["status"] == "solved" and row["verified"] is False
+
+
+def test_statistics_do_not_depend_on_the_python_hash_seed():
+    """Set iteration order changes with PYTHONHASHSEED; the statistics must not."""
+    import os
+    import subprocess
+    import sys
+    root = Path(__file__).resolve().parent.parent
+    code = (
+        "import json;from cluster_scheduler.benchmark import run_one, pruning_one;"
+        "keys=['nodes_expanded','backtracks','constraint_checks','arcs_processed','values_pruned'];"
+        "rows=[run_one(c,12,4,0.85,0.3,s) for c in ('bt','bt_mrv','ac3_bt','ac3_bt_mrv') for s in range(6)];"
+        "pr=[pruning_one(10,4,0.8,0.3,s,'mixed') for s in range(16)];"
+        "print(json.dumps([[r[k] for k in keys] for r in rows]+[[p['pct_removed_total'],p['arcs_processed'],p['revisions']] for p in pr]))"
+    )
+    outputs = set()
+    for hash_seed in ("0", "1", "2", "random"):
+        env = dict(os.environ, PYTHONHASHSEED=hash_seed, PYTHONPATH=str(root))
+        outputs.add(subprocess.run([sys.executable, "-c", code], cwd=root, env=env,
+                                   capture_output=True, text=True, check=True).stdout)
+    assert len(outputs) == 1

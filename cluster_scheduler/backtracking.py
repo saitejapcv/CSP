@@ -46,9 +46,11 @@ class Checker:
 
         # binary[v] = [(other_var, [constraints with allows]), ...]
         self.binary = {}
+        position = {v: i for i, v in enumerate(csp.variables)}
         for v in csp.variables:
             entries = []
-            for other in csp.neighbours(v):
+            # variable order, not set order, so constraint_checks is reproducible
+            for other in sorted(csp.neighbours(v), key=lambda x: (position.get(x, len(position)), str(x))):
                 cons = [c for c in csp.constraints_between(v, other) if hasattr(c, "allows")]
                 if cons:
                     entries.append((other, cons))
